@@ -27,6 +27,7 @@ from detectron2.data.detection_utils import convert_PIL_to_numpy,_apply_exif_ori
 from torchvision.transforms.functional import to_pil_image
 
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+is_low_vram = True
 
 def pil_to_binary_mask(pil_image, threshold=0):
     np_image = np.array(pil_image)
@@ -107,6 +108,10 @@ tensor_transfrom = transforms.Compose(
                 transforms.Normalize([0.5], [0.5]),
             ]
     )
+UNet_Encoder.to(device)
+unet.eval()
+UNet_Encoder.eval()
+openpose_model.preprocessor.body_estimation.model.to(device)
 
 pipe = TryonPipeline.from_pretrained(
         base_path,
@@ -120,15 +125,12 @@ pipe = TryonPipeline.from_pretrained(
         scheduler = noise_scheduler,
         image_encoder=image_encoder,
         torch_dtype=torch.float16,
-)
+).to(device)
 pipe.unet_encoder = UNet_Encoder
+if is_low_vram:
+    pipe.enable_sequential_cpu_offload()
 
 def start_tryon(dict,garm_img,garment_des,is_checked,is_checked_crop,denoise_steps,seed):
-    
-    openpose_model.preprocessor.body_estimation.model.to(device)
-    pipe.to(device)
-    pipe.unet_encoder.to(device)
-
     garm_img= garm_img.convert("RGB").resize((768,1024))
     human_img_orig = dict["background"].convert("RGB")    
     
@@ -309,5 +311,5 @@ with image_blocks as demo:
             
 
 
-image_blocks.launch()
+image_blocks.launch(share=True)
 
