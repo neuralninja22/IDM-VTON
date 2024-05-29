@@ -120,95 +120,98 @@ def pil_to_binary_mask(pil_image, threshold=0):
     return output_mask
 
 
-base_path = 'yisol/IDM-VTON'
-example_path = os.path.join(os.path.dirname(__file__), 'example')
-
-unet = UNet2DConditionModel.from_pretrained(
-    base_path,
-    subfolder="unet",
-    torch_dtype=torch.float16,
-)
-unet.requires_grad_(False)
-tokenizer_one = AutoTokenizer.from_pretrained(
-    base_path,
-    subfolder="tokenizer",
-    revision=None,
-    use_fast=False,
-)
-tokenizer_two = AutoTokenizer.from_pretrained(
-    base_path,
-    subfolder="tokenizer_2",
-    revision=None,
-    use_fast=False,
-)
-noise_scheduler = DDPMScheduler.from_pretrained(base_path, subfolder="scheduler")
-
-text_encoder_one = CLIPTextModel.from_pretrained(
-    base_path,
-    subfolder="text_encoder",
-    torch_dtype=torch.float16,
-)
-text_encoder_two = CLIPTextModelWithProjection.from_pretrained(
-    base_path,
-    subfolder="text_encoder_2",
-    torch_dtype=torch.float16,
-)
-image_encoder = CLIPVisionModelWithProjection.from_pretrained(
-    base_path,
-    subfolder="image_encoder",
-    torch_dtype=torch.float16,
-    )
-vae = AutoencoderKL.from_pretrained(base_path,
-                                    subfolder="vae",
-                                    torch_dtype=torch.float16,
-)
-
-# "stabilityai/stable-diffusion-xl-base-1.0",
-UNet_Encoder = UNet2DConditionModel_ref.from_pretrained(
-    base_path,
-    subfolder="unet_encoder",
-    torch_dtype=torch.float16,
-)
+base_path = 'ninjaneural/IDM-VTON'
 
 parsing_model = Parsing(0)
 openpose_model = OpenPose(0)
-
-UNet_Encoder.requires_grad_(False)
-image_encoder.requires_grad_(False)
-vae.requires_grad_(False)
-unet.requires_grad_(False)
-text_encoder_one.requires_grad_(False)
-text_encoder_two.requires_grad_(False)
-tensor_transfrom = transforms.Compose(
-            [
-                transforms.ToTensor(),
-                transforms.Normalize([0.5], [0.5]),
-            ]
-    )
-UNet_Encoder.to(device)
-unet.eval()
-UNet_Encoder.eval()
 openpose_model.preprocessor.body_estimation.model.to(device)
+tensor_transfrom = transforms.Compose(
+    [
+        transforms.ToTensor(),
+        transforms.Normalize([0.5], [0.5]),
+    ]
+)
 
-pipe = TryonPipeline.from_pretrained(
+def create_pipeline(low_vram=True):
+    unet = UNet2DConditionModel.from_pretrained(
         base_path,
-        unet=unet,
-        vae=vae,
-        feature_extractor= CLIPImageProcessor(),
-        text_encoder = text_encoder_one,
-        text_encoder_2 = text_encoder_two,
-        tokenizer = tokenizer_one,
-        tokenizer_2 = tokenizer_two,
-        scheduler = noise_scheduler,
-        image_encoder=image_encoder,
+        subfolder="unet",
         torch_dtype=torch.float16,
-).to(device)
-pipe.unet_encoder = UNet_Encoder
-if is_low_vram:
-    pipe.enable_sequential_cpu_offload()
+        variant="fp16",
+    )
+    unet.requires_grad_(False)
+    tokenizer_one = AutoTokenizer.from_pretrained(
+        base_path,
+        subfolder="tokenizer",
+        revision=None,
+        use_fast=False,
+    )
+    tokenizer_two = AutoTokenizer.from_pretrained(
+        base_path,
+        subfolder="tokenizer_2",
+        revision=None,
+        use_fast=False,
+    )
+    noise_scheduler = DDPMScheduler.from_pretrained(base_path, subfolder="scheduler")
 
-def start_tryon(dict,garm_img,garment_des,pose_img,mask_img=None,auto_mask_category="upper_body",is_checked_crop=False,denoise_steps=30,seed=42):
-    garm_img= garm_img.convert("RGB").resize((768,1024))
+    text_encoder_one = CLIPTextModel.from_pretrained(
+        base_path,
+        subfolder="text_encoder",
+        torch_dtype=torch.float16,
+    )
+    text_encoder_two = CLIPTextModelWithProjection.from_pretrained(
+        base_path,
+        subfolder="text_encoder_2",
+        torch_dtype=torch.float16,
+    )
+    image_encoder = CLIPVisionModelWithProjection.from_pretrained(
+        base_path,
+        subfolder="image_encoder",
+        torch_dtype=torch.float16,
+        )
+    vae = AutoencoderKL.from_pretrained(base_path,
+                                        subfolder="vae",
+                                        torch_dtype=torch.float16,
+    )
+
+    # "stabilityai/stable-diffusion-xl-base-1.0",
+    UNet_Encoder = UNet2DConditionModel_ref.from_pretrained(
+        base_path,
+        subfolder="unet_encoder",
+        torch_dtype=torch.float16,
+    )
+
+    UNet_Encoder.requires_grad_(False)
+    image_encoder.requires_grad_(False)
+    vae.requires_grad_(False)
+    unet.requires_grad_(False)
+    text_encoder_one.requires_grad_(False)
+    text_encoder_two.requires_grad_(False)
+
+    UNet_Encoder.to(device)
+    unet.eval()
+    UNet_Encoder.eval()
+
+    pipe = TryonPipeline.from_pretrained(
+            base_path,
+            unet=unet,
+            vae=vae,
+            feature_extractor= CLIPImageProcessor(),
+            text_encoder = text_encoder_one,
+            text_encoder_2 = text_encoder_two,
+            tokenizer = tokenizer_one,
+            tokenizer_2 = tokenizer_two,
+            scheduler = noise_scheduler,
+            image_encoder=image_encoder,
+            torch_dtype=torch.float16,
+    ).to(device)
+    pipe.unet_encoder = UNet_Encoder
+    if low_vram:
+        pipe.enable_sequential_cpu_offload()
+    return pipe
+
+def start_tryon(pipe, dict,garm_img,garment_des,pose_img,mask_img=None,auto_mask_category="upper_body",denoise_steps=30,seed=42,is_checked_crop=False,make_width=768,make_height=1024):
+    garm_img = garm_img.convert("RGB").resize((make_width,make_height))
     human_img_orig = dict["background"].convert("RGB")    
     
     if is_checked_crop:
@@ -221,18 +224,18 @@ def start_tryon(dict,garm_img,garment_des,pose_img,mask_img=None,auto_mask_categ
         bottom = (height + target_height) / 2
         cropped_img = human_img_orig.crop((left, top, right, bottom))
         crop_size = cropped_img.size
-        human_img = cropped_img.resize((768,1024))
+        human_img = cropped_img.resize((make_width,make_height))
     else:
-        human_img = human_img_orig.resize((768,1024))
+        human_img = human_img_orig.resize((make_width,make_height))
 
 
     if not mask_img:
         keypoints = openpose_model(human_img.resize((384,512)))
         model_parse, _ = parsing_model(human_img.resize((384,512)))
         mask, mask_gray = get_mask_location('hd', auto_mask_category, model_parse, keypoints)
-        mask = mask.resize((768,1024))
+        mask = mask.resize((make_width,make_height))
     else:
-        mask = mask_img.resize((768, 1024))
+        mask = mask_img.resize((make_width, make_height))
         # mask = transforms.ToTensor()(mask)
         # mask = mask.unsqueeze(0)
     mask_gray = (1-transforms.ToTensor()(mask)) * tensor_transfrom(human_img)
@@ -310,7 +313,7 @@ def start_tryon(dict,garm_img,garment_des,pose_img,mask_img=None,auto_mask_categ
     if is_checked_crop:
         out_img = images[0].resize(crop_size)        
         human_img_orig.paste(out_img, (int(left), int(top)))    
-        return human_img_orig, mask_gray
+        return human_img_orig, mask, mask_gray
     else:
-        return images[0], mask_gray
+        return images[0], mask, mask_gray
     # return images[0], mask_gray
