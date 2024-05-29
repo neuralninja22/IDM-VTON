@@ -1,3 +1,23 @@
+## ComfyUI Custom Node 추가
+
+## Models
+
+<https://huggingface.co/levihsu/OOTDiffusion/resolve/main/checkpoints/openpose/ckpts/body_pose_model.pth>
+
+ckpt/openpose/ckpts
+
+<https://huggingface.co/yisol/IDM-VTON/resolve/main/humanparsing/parsing_atr.onnx>
+
+ckpt/humanparsing
+
+<https://huggingface.co/yisol/IDM-VTON/resolve/main/humanparsing/parsing_lip.onnx>
+
+ckpt/humanparsing
+
+https://huggingface.co/yisol/IDM-VTON
+https://huggingface.co/levihsu/OOTDiffusion
+
+
 
 <div align="center">
 <h1>IDM-VTON: Improving Diffusion Models for Authentic Virtual Try-on in the Wild</h1>

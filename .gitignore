@@ -1,0 +1,8 @@
+__pycache__
+*.py[cod]
+*.onnx
+wheels/
+node_modules/
+compose.yaml
+comfy_mtb.wsb
+Dockerfile

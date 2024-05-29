@@ -47,7 +47,7 @@ from diffusers.models.embeddings import (
 
 
 from diffusers.models.modeling_utils import ModelMixin
-from src.unet_block_hacked_tryon import (
+from .unet_block_hacked_tryon import (
     UNetMidBlock2D,
     UNetMidBlock2DCrossAttn,
     UNetMidBlock2DSimpleCrossAttn,

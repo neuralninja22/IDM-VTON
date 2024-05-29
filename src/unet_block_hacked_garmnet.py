@@ -25,7 +25,7 @@ from diffusers.models.attention_processor import Attention, AttnAddedKVProcessor
 from diffusers.models.dual_transformer_2d import DualTransformer2DModel
 from diffusers.models.normalization import AdaGroupNorm
 from diffusers.models.resnet import Downsample2D, FirDownsample2D, FirUpsample2D, KDownsample2D, KUpsample2D, ResnetBlock2D, Upsample2D
-from src.transformerhacked_garmnet import Transformer2DModel
+from .transformerhacked_garmnet import Transformer2DModel
 from einops import rearrange
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
