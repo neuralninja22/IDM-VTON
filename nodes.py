@@ -71,12 +71,13 @@ class IDM_VTON_Processor:
             "required": {
                 "pipeline": ("PIPE_LINE",),
                 "human_image": ("IMAGE",),
-                "clothe_image": ("IMAGE",),
+                "clothes_image": ("IMAGE",),
                 "densepose_image": ("IMAGE",),
                 "auto_mask_category": (["upper_body", "lower_body", "dresses"],),
                 "prompt": ("STRING", {
                     "multiline": True,
-                    "default": ""
+                    "default": "",
+                    "placeholder": "clothes prompt. ex) Short Sleeve Round Neck T-shirts",
                 }),
                 "fit_human_image_size": ("BOOLEAN", {"default": True}),
                 "fix_origin_merge": ("BOOLEAN", {"default": False}),
@@ -91,12 +92,12 @@ class IDM_VTON_Processor:
 
     CATEGORY = "IDM-VTON"
 
-    def process_and_execute(self, pipeline, human_image, clothe_image, densepose_image, auto_mask_category, prompt, fit_human_image_size, fix_origin_merge, denoise_steps, seed):
+    def process_and_execute(self, pipeline, human_image, clothes_image, densepose_image, auto_mask_category, prompt, fit_human_image_size, fix_origin_merge, denoise_steps, seed):
         to_pil = ToPILImage()
         to_tensor = ToTensor()
 
         human_image_batch = human_image.movedim(-1,1)
-        clothe_image_batch = clothe_image.movedim(-1,1)
+        clothe_image_batch = clothes_image.movedim(-1,1)
         densepose_image_batch = densepose_image.movedim(-1,1)
         image_out_list = []
         masked_img_list = []
@@ -142,12 +143,13 @@ class IDM_VTON_MASK_Processor:
             "required": {
                 "pipeline": ("PIPE_LINE",),
                 "human_image": ("IMAGE",),
-                "clothe_image": ("IMAGE",),
+                "clothes_image": ("IMAGE",),
                 "densepose_image": ("IMAGE",),
                 "mask_image": ("IMAGE",),
                 "prompt": ("STRING", {
                     "multiline": True,
-                    "default": ""
+                    "default": "",
+                    "placeholder": "clothes prompt. ex) Short Sleeve Round Neck T-shirts",
                 }),
                 "fit_human_image_size": ("BOOLEAN", {"default": True}),
                 "fix_origin_merge": ("BOOLEAN", {"default": False}),
@@ -162,12 +164,12 @@ class IDM_VTON_MASK_Processor:
 
     CATEGORY = "IDM-VTON"
 
-    def process_and_execute(self, pipeline, human_image, clothe_image, densepose_image, mask_image, prompt, fit_human_image_size, fix_origin_merge, denoise_steps, seed):
+    def process_and_execute(self, pipeline, human_image, clothes_image, densepose_image, mask_image, prompt, fit_human_image_size, fix_origin_merge, denoise_steps, seed):
         to_pil = ToPILImage()
         to_tensor = ToTensor()
 
         human_image_batch = human_image.movedim(-1,1)
-        clothe_image_batch = clothe_image.movedim(-1,1)
+        clothe_image_batch = clothes_image.movedim(-1,1)
         densepose_image_batch = densepose_image.movedim(-1,1)
         mask_image_batch = mask_image.movedim(-1,1)
         image_out_list = []
