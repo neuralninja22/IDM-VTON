@@ -5,3 +5,5 @@ av
 fvcore
 cloudpickle
 pycocotools
+scikit-image
+opencv-python
