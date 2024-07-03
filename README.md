@@ -1,23 +1,28 @@
 ## ComfyUI Custom Node 추가
 
-## Models
+comfyui에서 사용할수 있게 간단히 포팅해놓았어요 (diffuser 그대로 사용)
 
-<https://huggingface.co/levihsu/OOTDiffusion/resolve/main/checkpoints/openpose/ckpts/body_pose_model.pth>
-
-ckpt/openpose/ckpts
-
-<https://huggingface.co/yisol/IDM-VTON/resolve/main/humanparsing/parsing_atr.onnx>
-
-ckpt/humanparsing
-
-<https://huggingface.co/yisol/IDM-VTON/resolve/main/humanparsing/parsing_lip.onnx>
-
-ckpt/humanparsing
-
-https://huggingface.co/yisol/IDM-VTON
-https://huggingface.co/levihsu/OOTDiffusion
+VRAM이 15GB이하면 low_ram을 체크해주세요!
 
 
+## Models 저장
+
+> <https://huggingface.co/levihsu/OOTDiffusion/resolve/main/checkpoints/openpose/ckpts/body_pose_model.pth>  
+> IDM_VTON 커스텀노드 ckpt/openpose/ckpts 이곳에 저장해주세요
+
+> <https://huggingface.co/yisol/IDM-VTON/resolve/main/humanparsing/parsing_atr.onnx>  
+> IDM_VTON 커스텀노드 ckpt/humanparsing
+
+> <https://huggingface.co/yisol/IDM-VTON/resolve/main/humanparsing/parsing_lip.onnx>  
+> IDM_VTON 커스텀노드 ckpt/humanparsing
+
+## 데모
+
+<https://huggingface.co/yisol/IDM-VTON>  
+<https://huggingface.co/levihsu/OOTDiffusion>
+
+
+--- 
 
 <div align="center">
 <h1>IDM-VTON: Improving Diffusion Models for Authentic Virtual Try-on in the Wild</h1>
