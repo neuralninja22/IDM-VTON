@@ -20,7 +20,9 @@ VRAM이 15GB이하면 low_ram을 체크해주세요!
 
 윈도우 기본 comfyui의 경우는 install.bat를 클릭해서 모듈들을 설치해주세요
 
-pip로 직접 설치해도 되요~
+venv를 구성해서 사용하는 comfyui의 경우(StableMatrix등)는 install_venv.bat를 클릭해서 모듈들을 설치해주세요
+
+pip로 직접 설치해도 되요
 ```
 pip install -r requirements.txt
 ```
