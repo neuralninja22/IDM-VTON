@@ -16,6 +16,9 @@ VRAM이 15GB이하면 low_ram을 체크해주세요!
 > <https://huggingface.co/yisol/IDM-VTON/resolve/main/humanparsing/parsing_lip.onnx>  
 > IDM_VTON 커스텀노드 ckpt/humanparsing
 
+> <https://huggingface.co/yisol/IDM-VTON/resolve/main/densepose/model_final_162be9.pkl>  
+> IDM_VTON 커스텀노드 ckpt/densepose
+
 ## 설치
 
 윈도우 기본 comfyui의 경우는 install.bat를 클릭해서 모듈들을 설치해주세요
